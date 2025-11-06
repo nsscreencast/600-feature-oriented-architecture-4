@@ -1,0 +1,90 @@
+import ProjectDescription
+import ProjectDescriptionHelpers
+
+let project = Project(
+    name: "{{ name }}",
+    targets: [
+        .target(
+            name: "{{ name }}ExampleApp",
+            destinations: .iOS,
+            product: .app,
+            bundleId: "{{ bundle_id_base }}.{{ name | lowercase }}.example-app",
+            infoPlist: .extendingDefault(
+                with: [
+                    "UILaunchScreen": [
+                        "UIColorName": "",
+                        "UIImageName": "",
+                    ],
+                ]
+            ),
+            buildableFolders: [
+                "ExampleApp/Sources",
+                // "ExampleApp/Resources",
+            ],
+            dependencies: [
+                .target(name: "{{ name }}"),
+                .target(name: "{{ name }}Interface"),
+                .target(name: "{{ name }}TestSupport"),
+            ]
+        ),
+
+        .target(
+             name: "{{ name }}Interface",
+             destinations: .iOS,
+             product: .framework,
+             bundleId: "{{ bundle-id-base }}.{{ name | lowercase }}",
+             buildableFolders: [
+                 "Interface/Sources",
+                 // "Interface/Resources",
+             ],
+             dependencies: []
+         ),
+
+         .target(
+             name: "{{ name }}",
+             destinations: .iOS,
+             product: .framework,
+             bundleId: "{{ bundle-id-base }}.{{ name | lowercase }}.impl",
+             buildableFolders: [
+                 "Implementation/Sources",
+                 // "Implementation/Resources",
+             ],
+             dependencies: [
+                 .target(name: "{{ name }}Interface")
+             ]
+         ),
+
+         .target(
+            name: "{{ name }}TestSupport",
+            destinations: .iOS,
+            product: .framework,
+            bundleId: "{{ bundle-id-base }}.{{ name | lowercase }}.test-support",
+            buildableFolders: [
+                "TestSupport/Sources",
+                // "TestSupport/Resources",
+            ],
+            dependencies: [
+                .target(name: "{{ name }}Interface"),
+                .target(name: "{{ name }}")
+            ]
+        ),
+
+
+        .target(
+            name: "{{ name }}Tests",
+            destinations: .iOS,
+            product: .unitTests,
+            bundleId: "{{ bundle-id-base }}.{{ name | lowercase }}.tests",
+            infoPlist: .default,
+            buildableFolders: [
+                "Tests/Sources",
+                // "Tests/Resources",
+            ],
+            dependencies: [
+                .target(name: "{{ name }}Interface"),
+                .target(name: "{{ name }}"),
+                .target(name: "{{ name }}TestSupport"),
+            ]
+        ),
+    ]
+)
